@@ -3,9 +3,18 @@ version: '3.8'
 services:
   frontend:
     build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
     ports:
       - "3000:3000"
   backend:
     build: ./backend
+    restart: unless-stopped
+    hostname: backend
     ports:
       - "5000:5000"
+
+networks:
+  default:
+    name: simulator-net

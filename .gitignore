@@ -128,3 +128,11 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+*venv
+.cache.sqlite
+*.pyc
+*.pyo
+*.pyd
+*.pyz
+*.pyw
+backend/__pycache__/app.cpython-312.pyc

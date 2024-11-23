@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY requirements.txt requirements.txt
 
-RUN python -m venv .venv && .venv/bin/pip install -r requirements.txt
+RUN python -m venv .venv && \
+    .venv/bin/pip install -r requirements.txt
 
 COPY . .
 
