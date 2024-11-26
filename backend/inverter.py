@@ -251,7 +251,6 @@ class Inverter:
                 self.battery.current = 0
             #print(f"Current: {self.battery.current}")
             self.update_modbus_context()
-            self.power_meter.update_inv_power(self.get_power())
             self.timer = threading.Timer(self.update_timer, self.schedule_power_output)
             self.timer.start()
             
@@ -269,7 +268,8 @@ class Inverter:
         self.modbus.set_modbus_server_parameter_value("battery_type", 1)
         self.modbus.set_modbus_server_parameter_value("battery_power", self.battery.current * self.battery.volts)
         self.modbus.set_modbus_server_parameter_value("pv_power", self.solar_panel.solar_power)
-        self.modbus.set_modbus_server_parameter_value("solar_energy_index", self.solar_panel.solar_energy / 1000)
+        self.modbus.set_modbus_server_parameter_value("solar_energy_index", 705)
+        self.modbus.context[0].setValues(4, 0x100, [6])
     
     def get_power(self):
         return (self.solar_panel.solar_power - self.battery.current * self.battery.volts)

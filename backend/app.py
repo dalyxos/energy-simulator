@@ -11,6 +11,15 @@ app = Flask(__name__)
 def api_index():
     return {"version": version}
 
+@app.route('/api/load', methods=['GET'])
+def get_load():
+    return energyManager.load.to_json()
+
+@app.route('/api/load', methods=['POST'])
+def set_load():
+    energyManager.load.update_from_json(request.json)
+    return {"status": "success"}
+
 @app.route('/api/powermeter', methods=['GET'])
 def get_powermeter():
     return energyManager.power_meter.to_json()

@@ -11,11 +11,8 @@ class PowerMeter:
     def __init__(self, current_limit=30, power_meter_cfg=None):
         print("PowerMeter init")
         self.current_limit = current_limit
-        self.load_limit_max = 10
-        self.load_limit_min = 0
-        self.load_current = 0
         self.inverter_power = 0
-        self.current = self.load_current
+        self.current = 0
         self.injected_power = 1000
         if power_meter_cfg:
             self.voltage = power_meter_cfg['voltage']
@@ -28,22 +25,12 @@ class PowerMeter:
         self.broadcast_thread.daemon = False
         self.broadcast_thread.start()
 
-        self.update_load_current_thread = threading.Thread(target=self.update_current_randomly)
-        self.update_load_current_thread.daemon = True
-        self.update_load_current_thread.start()
-
         self.modbus_rtu_task = threading.Thread(target=self.start_rtu_server)
         self.modbus_rtu_task.daemon = False
         self.modbus_rtu_task.start()
-        
-    def update_inv_power(self, power):
-        self.inverter_power = power
 
-    def update_current_randomly(self):
-        while True:
-            self.load_current = random.uniform(self.load_limit_min * self.current_limit / 100, self.load_limit_max * self.current_limit / 100)
-            self.current = self.load_current - self.inverter_power / self.voltage
-            time.sleep(1)
+    def add_device(self, device):
+        self.devices.append(device)
 
     def get_current(self):
         return self.current
@@ -52,10 +39,10 @@ class PowerMeter:
         return self.voltage
 
     def get_power(self):
-        return self.current * self.voltage
+        return self.current * self.voltage - self.inverter_power
 
     def get_load(self):
-        return self.load_current * self.voltage
+        return self.current * self.voltage
 
     def set_current(self, current):
         self.current = current
@@ -65,8 +52,6 @@ class PowerMeter:
         
     def to_json(self):
         data = {
-            "load_limit_max": self.load_limit_max,
-            "load_limit_min": self.load_limit_min,
             "current_limit": self.current_limit,
             "current": round(self.current, 3),
             "voltage": round(self.voltage, 1),
@@ -81,10 +66,6 @@ class PowerMeter:
                 self.current_limit = data["current_limit"]
             if "voltage" in data:
                 self.voltage = data["voltage"]
-            if "load_limit_max" in data:
-                self.load_limit_max = data["load_limit_max"]
-            if "load_limit_min" in data:
-                self.load_limit_min = data["load_limit_min"]
             if "injected_power" in data:
                 self.injected_power = data["injected_power"]
         except json.JSONDecodeError as e:

@@ -11,10 +11,10 @@ class Modbus:
     def __init__(self, port, parameters):
         self.port = port
         self.parameters = parameters
-        max_hr_address = 250
-        max_ir_address = 250
-        max_fc6_address = 250
-        max_fc16_address = 250
+        max_hr_address = 400
+        max_ir_address = 400
+        max_fc6_address = 400
+        max_fc16_address = 400
         #print(f'parameters: {parameters}')
         for item in parameters:
             #print(f'item: {item}')
