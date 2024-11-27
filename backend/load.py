@@ -54,6 +54,16 @@ class Load(Device):
         }
         return json.dumps(data)
     
+    def phase_to_json(self, index):
+        data = {
+            "current": round(self.load_current[index], 3),
+            "voltage": round(self.voltage[index], 1),
+            "power": round(self.voltage[index] * self.load_current[index], 3),
+            "load_limit_max": self.load_limit_max[index],
+            "load_limit_min": self.load_limit_min[index],
+        }
+        return json.dumps(data)
+    
     def update_from_json(self, data):
         try:
             print(data)

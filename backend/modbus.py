@@ -7,8 +7,23 @@ from pymodbus.device import ModbusDeviceIdentification
 #import logging
 #logging.basicConfig(level=logging.DEBUG)
 
+class CustomDataBlock(ModbusSequentialDataBlock):
+    def __init__(self, address, values, fc, callback=None):
+        super().__init__(address, values)
+        self.fc = fc
+        self.callback = callback
+
+    def setValues(self, address, values):
+        if(self.callback):
+            self.callback(self.fc, address, values)
+        for i, value in enumerate(values):
+            self.values[address + i] = value
+
+    def getValues(self, address, count=1):
+        return super().getValues(address, count)
+
 class Modbus:
-    def __init__(self, port, parameters):
+    def __init__(self, port, parameters, callback=None):
         self.port = port
         self.parameters = parameters
         max_hr_address = 400
@@ -32,12 +47,10 @@ class Modbus:
         print(f'max_fc6_address: {max_fc6_address}')
         
         store = ModbusSlaveContext(
-            di=ModbusSequentialDataBlock(0, [0]*100),
-            co=ModbusSequentialDataBlock(0, [0]*100),
             hr=ModbusSequentialDataBlock(0, [0]*max_hr_address),
             ir=ModbusSequentialDataBlock(0, [0]*max_ir_address))
-        store.register(6, 'fc6', ModbusSequentialDataBlock(0, [0]*max_fc6_address))  # Data block for function code 6
-        store.register(16, 'fc16', ModbusSequentialDataBlock(0, [0]*max_fc16_address))  # Data block for function code 6
+        store.register(6, 'fc6', CustomDataBlock(0, [0]*max_fc6_address, 6))  # Data block for function code 6
+        store.register(16, 'fc16', CustomDataBlock(0, [0]*max_fc16_address, 16))  # Data block for function code 6
 
         self.context = ModbusServerContext(slaves=store, single=True)
 

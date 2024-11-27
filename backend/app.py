@@ -20,6 +20,17 @@ def set_load():
     energyManager.load.update_from_json(request.json)
     return {"status": "success"}
 
+@app.route('/api/load/phase/<int:phase>', methods=['GET'])
+def get_load_phase(phase):
+    return energyManager.load.phase_to_json(phase-1)
+
+@app.route('/api/load/phase/<int:phase>', methods=['POST'])
+def set_load_phase(phase):
+    data = request.json
+    data2 = { "phase" + str(phase): data }
+    energyManager.load.update_from_json(data2)
+    return {"status": "success"}
+
 @app.route('/api/powermeter', methods=['GET'])
 def get_powermeter():
     return energyManager.power_meter.to_json()
