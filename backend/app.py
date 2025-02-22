@@ -6,10 +6,13 @@ from load import Load
 class EnergySimulator:
     def __init__(self):
         self.load = Load()
-        self.smart_meter = SmartMeter(10, self.callback)
+        self.smart_meter = SmartMeter(10, callback=self.callback)
+        self.smart_meter.start_callback_thread()
 
     def callback(self):
         self.load.generate_current()
+        self.smart_meter.current = self.load.current
+        
 
 sim = EnergySimulator()
 
@@ -27,7 +30,8 @@ def version():
 def overview():
     return {
         "load": sim.load.to_json(),
-        "breaker_current": sim.smart_meter.breaker_current
+        "breaker_current": sim.smart_meter.breaker_current,
+        "smartmeter": sim.smart_meter.to_json()
     }
 
 @app.route('/api/load/config')

@@ -4,6 +4,9 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid2';
 
+import Header from './Header';
+import Smartmeter from './Smartmeter';
+
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#cee',
   ...theme.typography.body2,
@@ -17,19 +20,17 @@ const Item = styled(Paper)(({ theme }) => ({
 
 function BasicGrid() {
 
-  const [apiVersion, setApiVersion] = React.useState('');
-
-  React.useEffect(() => {
-    fetch('/api/version')
-      .then(response => response.json())
-      .then(data => setApiVersion(data.version))
-      .catch(error => console.error('Error fetching API version:', error));
-  }, []);
-
   const [overviewData, setOverviewData] = React.useState({
     load: {
       current: [0, 0, 0]
     },
+    smartmeter:
+    {
+      voltage: [0, 0, 0],
+      current: [0, 0, 0],
+      power: [0, 0, 0],
+      tot_power: 0
+    }
   });
 
   React.useEffect(() => {
@@ -41,7 +42,7 @@ function BasicGrid() {
           console.log('Overview data:', data);
         })
         .catch(error => console.error('Error fetching overview data:', error));
-    }, 1000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);
@@ -50,32 +51,10 @@ function BasicGrid() {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
         <Grid size={12}>
-          <Item sx={{ backgroundColor: '#033', color: '#FFF' }}>{apiVersion ? `API Version: ${apiVersion}` : 'Loading...'}</Item>
+          <Header />
         </Grid>
         <Grid size={3}>
-          <Item>
-            Load Info
-            <table style={{ width: '100%' }}>
-              <thead>
-                <tr>
-                  <th style={{width: '28%'}}>Phase</th>
-                  <th style={{width: '18%'}}>L1</th>
-                  <th style={{width: '18%'}}>L2</th>
-                  <th style={{width: '18%'}}>L3</th>
-                  <th style={{width: '18%'}}>Max</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>Current (A)</td>
-                  {overviewData.load.current.map((current, index) => (
-                    <td key={index}>{current}</td>
-                  ))}
-                  <td>{Math.max(...overviewData.load.current)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </Item>
+          <Smartmeter load={overviewData.load} smartmeter={overviewData.smartmeter} />
         </Grid>
         <Grid size={3}>
           <Item>Charging Stations</Item>
