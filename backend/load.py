@@ -19,6 +19,7 @@ class Load:
         }
         
     def json_to_config(self, json):
+        print(json)
         if "current_limit" in json:
             self.current_limit = json["current_limit"]
         return self.config_to_json()

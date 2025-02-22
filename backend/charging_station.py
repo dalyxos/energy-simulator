@@ -87,6 +87,7 @@ class ChargingStation():
         return {
             "max_current": self.max_current,
             "phases": self.phases,
+            "hems": self.hems,
             "vehicle_connected": self.vehicle.connected
         }
         
@@ -95,6 +96,8 @@ class ChargingStation():
             self.max_current = json["max_current"]
         if "phases" in json:
             self.phases = json["phases"]
+        if "hems" in json:
+            self.hems = json["hems"]
         if "vehicle_connected" in json:
             if json["vehicle_connected"]:
                 self.vehicle.connect()

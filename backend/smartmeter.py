@@ -25,6 +25,18 @@ class SmartMeter:
             if self.callback:
                 self.callback()
             time.sleep(1)
+
+    def config_to_json(self):
+        return {
+            "breaker_current": self.breaker_current,
+            "voltage_limit": self.voltage_limit
+        }
+    
+    def config_from_json(self, json):
+        if("voltage_limit" in json):
+            self.voltage_limit = json["voltage_limit"]
+        if("breaker_current" in json):
+            self.breaker_current = json["breaker_current"]
     
     def to_json(self):
         return {

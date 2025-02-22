@@ -1,5 +1,4 @@
-from urllib import request
-from flask import Flask
+from flask import Flask, request
 from smartmeter import SmartMeter
 from load import Load
 from charging_station import ChargingStation

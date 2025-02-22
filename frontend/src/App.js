@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid2';
 import Header from './Header';
 import Smartmeter from './Smartmeter';
 import ChargingStations from './ChargingStations';
+import Settings from './Settings';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#cee',
@@ -68,7 +69,7 @@ function BasicGrid() {
           <Item>Heat Pump</Item>
         </Grid>
         <Grid size={12}>
-          <Item>Settings / Config</Item>
+          <Settings />
         </Grid>
       </Grid>
     </Box>
