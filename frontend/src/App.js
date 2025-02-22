@@ -6,6 +6,7 @@ import Grid from '@mui/material/Grid2';
 
 import Header from './Header';
 import Smartmeter from './Smartmeter';
+import ChargingStations from './ChargingStations';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: '#cee',
@@ -30,7 +31,8 @@ function BasicGrid() {
       current: [0, 0, 0],
       power: [0, 0, 0],
       tot_power: 0
-    }
+    },
+    charging_stations: []
   });
 
   React.useEffect(() => {
@@ -57,7 +59,7 @@ function BasicGrid() {
           <Smartmeter load={overviewData.load} smartmeter={overviewData.smartmeter} />
         </Grid>
         <Grid size={3}>
-          <Item>Charging Stations</Item>
+          <ChargingStations charging_stations={overviewData.charging_stations} />
         </Grid>
         <Grid size={3}>
           <Item>Inverters</Item>
