@@ -47,20 +47,20 @@ function SmartmeterConfig({ value }) {
                         value={current_limit}
                         valueLabelDisplay="auto"
                         onChange={(event, newValue) => {
-                          if (newValue[0] <= newValue[1]) {
-                            setLoadConfig({
-                              current_limit: loadConfig.current_limit.map((limit, i) => i === index ? newValue : limit)
-                            });
-                            fetch('/api/load/config', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json'
-                              },
-                              body: JSON.stringify({
-                                current_limit: loadConfig.current_limit
-                              })
-                            });
-                          }
+                          loadConfig.current_limit[index] = newValue;
+                          setLoadConfig({ ...loadConfig });
+                          fetch('/api/load/config', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                              current_limit: loadConfig.current_limit
+                            })
+                          })
+                            .then(response => response.json())
+                            //.then(data => setLoadConfig(data))
+                            .catch(error => console.error('Error updating Load config:', error));
                         }}
                         getAriaValueText={valuetext}
                       />
