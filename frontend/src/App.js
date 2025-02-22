@@ -26,6 +26,26 @@ function BasicGrid() {
       .catch(error => console.error('Error fetching API version:', error));
   }, []);
 
+  const [overviewData, setOverviewData] = React.useState({
+    load: {
+      current: [0, 0, 0]
+    },
+  });
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      fetch('/api/overview')
+        .then(response => response.json())
+        .then(data => {
+          setOverviewData(data);
+          console.log('Overview data:', data);
+        })
+        .catch(error => console.error('Error fetching overview data:', error));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
@@ -33,7 +53,29 @@ function BasicGrid() {
           <Item sx={{ backgroundColor: '#033', color: '#FFF' }}>{apiVersion ? `API Version: ${apiVersion}` : 'Loading...'}</Item>
         </Grid>
         <Grid size={3}>
-          <Item>Load Info</Item>
+          <Item>
+            Load Info
+            <table style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th style={{width: '28%'}}>Phase</th>
+                  <th style={{width: '18%'}}>L1</th>
+                  <th style={{width: '18%'}}>L2</th>
+                  <th style={{width: '18%'}}>L3</th>
+                  <th style={{width: '18%'}}>Max</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Current (A)</td>
+                  {overviewData.load.current.map((current, index) => (
+                    <td key={index}>{current}</td>
+                  ))}
+                  <td>{Math.max(...overviewData.load.current)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </Item>
         </Grid>
         <Grid size={3}>
           <Item>Charging Stations</Item>
