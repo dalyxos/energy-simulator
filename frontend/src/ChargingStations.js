@@ -28,7 +28,7 @@ function ChargngStations({ charging_stations }) {
                                 <th style={{width: '15%'}}>L1</th>
                                 <th style={{width: '15%'}}>L2</th>
                                 <th style={{width: '15%'}}>L3</th>
-                                <th style={{width: '27%'}}>Total</th>
+                                <th style={{width: '27%'}}>HEMS</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -37,18 +37,7 @@ function ChargngStations({ charging_stations }) {
                                 {Array.isArray(charging_station.current) && charging_station.current.map((current, index) => (
                                     <td key={index}>{current}</td>
                                 ))}
-                                <td>MAX: {charging_station.current ? Math.max(...charging_station.current) : 'N/A'}</td>
-                            </tr>
-                            <tr>
-                                <td>Power (kW)</td>
-                                {Array.isArray(charging_station.power) && charging_station.power.map((power, index) => (
-                                    <td key={index}>{power}</td>
-                                ))}
-                                <td>{charging_station.tot_power}</td>
-                            </tr>
-                            <tr>
-                                <td>Energy (kWh)</td><td></td><td></td><td></td>
-                                <td>{charging_station.energy_index}</td>
+                                <td>{charging_station.hems}</td>
                             </tr>
                         </tbody>
                     </table>

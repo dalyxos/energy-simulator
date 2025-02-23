@@ -7,12 +7,13 @@ class EnergySimulator:
     def __init__(self):
         self.load = Load()
         self.smart_meter = SmartMeter(10, callback=self.callback)
-        self.charging_stations = [ChargingStation() for _ in range(1)]
+        self.charging_stations = [ChargingStation() for _ in range(3)]
         self.smart_meter.start_callback_thread()
 
     def callback(self):
         self.load.generate_current()
         for station in self.charging_stations:
+            station.voltage = self.smart_meter.voltage
             station.update()
         total_current = [0, 0, 0]
         for i in range(3):

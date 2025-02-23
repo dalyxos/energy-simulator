@@ -89,6 +89,7 @@ function ChargingStationConfig({index, chargingstation}) {
                       })
                     })
                       .then(response => response.json())
+                      .then(data => chargingstation.phases = data.phases)
                       .catch(error => console.error('Error updating Charging Station config:', error));
                   }
                   } 
@@ -116,6 +117,7 @@ function ChargingStationConfig({index, chargingstation}) {
                       body: JSON.stringify({phases: chargingstation.phases})
                     })
                       .then(response => response.json())
+                      .then(data => chargingstation.phases = data.phases)
                       .catch(error => console.error('Error updating Charging Station config:', error));
                   }
                   } 
@@ -143,6 +145,7 @@ function ChargingStationConfig({index, chargingstation}) {
                       body: JSON.stringify({phases: chargingstation.phases})
                     })
                       .then(response => response.json())
+                      .then(data => chargingstation.phases = data.phases)
                       .catch(error => console.error('Error updating Charging Station config:', error));
                   }
                   } 

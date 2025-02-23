@@ -1,5 +1,6 @@
 import time
 from enum import Enum
+import random
 
 class Vehicle:
     def __init__(self, capacity=50, max_current=16, soc=0, connected=False):
@@ -33,8 +34,10 @@ class Vehicle:
                 return self.max_current
             else:
                 return current
+        elif self.soc >= self.capacity:
+            return 0
         else:
-            return self.max_current * (1 - self.soc / self.capacity)
+            return self.max_current * (1 - (self.soc - self.capacity * 0.99) / (self.capacity * 0.01))
     
     def increase_soc(self, energy):
         self.soc += energy
@@ -45,9 +48,22 @@ class VehicleState(Enum):
     CHARGING = 2
     FULLY_CHARGED = 3
 
+valid_phases = [[0, 0, 1], [0, 0, 2], [0, 0, 3],
+                [0, 1, 0], [0, 1, 2], [0, 1, 3],
+                [0, 2, 0], [0, 2, 1], [0, 2, 3],
+                [0, 3, 0], [0, 3, 1], [0, 3, 2],
+                [1, 0, 0], [1, 0, 2], [1, 0, 3],
+                [1, 2, 0], [1, 2, 3],
+                [1, 3, 0], [1, 3, 2],
+                [2, 0, 0], [2, 0, 1], [2, 0, 3],
+                [2, 1, 0], [2, 1, 3],
+                [2, 3, 0], [2, 3, 1],
+                [3, 0, 0], [3, 0, 1], [3, 0, 2],
+                [3, 1, 0], [3, 1, 2],
+                [3, 2, 0], [3, 2, 1]]
 class ChargingStation():
     def __init__(self, max_current=16, phases=[1, 0, 0]):
-        self.vehicle = Vehicle(max_current=max_current)
+        self.vehicle = Vehicle(max_current=max_current, soc=49.9)
         self.max_current = max_current
         self.energy_index = 0
         self.phases = phases
@@ -57,19 +73,17 @@ class ChargingStation():
 
     def update(self):
         vehicle_current = self.vehicle.get_current()
-        print(f"vehicle_current: {vehicle_current}")
-        print(f"self.hems: {self.hems}")
         if vehicle_current > self.hems:
             vehicle_current = self.hems
-        self.current = [vehicle_current if i in self.phases else 0 for i in range(1, 4)]
-        increment = sum([self.current[i] * self.voltage[i] for i in range(3)]) / 1000
+        self.current = [vehicle_current * random.uniform(0.98, 1.02) if i in self.phases else 0 for i in range(1, 4)]
+        increment = sum([self.current[i] * self.voltage[i] for i in range(3)]) / (3600 * 1000)
         self.energy_index += increment
         self.vehicle.increase_soc(increment)
         
     def get_vehicle_state(self):
         if not self.vehicle.connected:
             return VehicleState.DISCONNECTED
-        elif self.vehicle.current == 0:
+        elif self.vehicle.get_current() == 0:
             return VehicleState.CONNECTED_NOT_CHARGING
         elif self.vehicle.soc >= self.vehicle.capacity:
             return VehicleState.FULLY_CHARGED
@@ -82,7 +96,8 @@ class ChargingStation():
             "voltage": [round(value, 2) for value in self.voltage],
             "current": [round(value, 2) for value in self.current],
             "soc": round(self.vehicle.soc * 100 / self.vehicle.capacity, 2),
-            "vehicle_state": self.get_vehicle_state().name
+            "vehicle_state": self.get_vehicle_state().name,
+            "hems": self.hems
         }
     
     def set_voltage(self, voltage):
@@ -100,7 +115,8 @@ class ChargingStation():
         print(json)
         if "max_current" in json:
             self.max_current = json["max_current"]
-        if "phases" in json:
+            self.vehicle.max_current = self.max_current
+        if "phases" in json and json["phases"] in valid_phases:
             self.phases = json["phases"]
         if "hems" in json:
             self.hems = json["hems"]
