@@ -50,6 +50,18 @@ def load_config():
 def set_load_config():
     return sim.load.json_to_config(request.json)
 
+@app.route('/api/sm/config')
+def smart_meter_config():
+    return sim.smart_meter.config_to_json()
+
+@app.route('/api/sm/config', methods=['POST'])
+def set_smart_meter_config():
+    return sim.smart_meter.config_from_json(request.json)
+
+@app.route('/api/cs/config')
+def charging_stations_config():
+    return [station.config_to_json() for station in sim.charging_stations]
+
 @app.route('/api/cs/config/<int:index>')
 def charging_station_config(index):
     return sim.charging_stations[index].config_to_json()
