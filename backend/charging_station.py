@@ -22,16 +22,19 @@ class Vehicle:
         
     def get_current(self):
         if not self.connected:
-            self.current = 0
+            return 0
         elif time.time() - self.charging_start_time < self.charging_start_delay:
-            self.current = 0
+            return 0
         elif self.soc >= self.capacity:
-            self.current = 0
+            return 0
         elif self.soc < self.capacity * 0.99:
-            self.current = self.max_current * (time.time() - self.charging_start_time - self.charging_start_delay) / self.charging_delay
+            current = self.max_current * (time.time() - self.charging_start_time - self.charging_start_delay) / self.charging_delay
+            if current > self.max_current:
+                return self.max_current
+            else:
+                return current
         else:
-            self.current = self.max_current * (1 - self.soc / self.capacity)
-        return self.current
+            return self.max_current * (1 - self.soc / self.capacity)
     
     def increase_soc(self, energy):
         self.soc += energy
@@ -54,6 +57,8 @@ class ChargingStation():
 
     def update(self):
         vehicle_current = self.vehicle.get_current()
+        print(f"vehicle_current: {vehicle_current}")
+        print(f"self.hems: {self.hems}")
         if vehicle_current > self.hems:
             vehicle_current = self.hems
         self.current = [vehicle_current if i in self.phases else 0 for i in range(1, 4)]

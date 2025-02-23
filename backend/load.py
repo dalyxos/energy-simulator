@@ -9,7 +9,6 @@ class Load:
         self.current = [random.uniform(self.current_limit[i][0], self.current_limit[i][1]) for i in range(3)]
         
     def to_json(self):
-        print(f"- load : {self.current}")
         return {
             "current": [round(value, 2) for value in self.current],
         }

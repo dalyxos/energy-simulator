@@ -14,9 +14,9 @@ class EnergySimulator:
         self.load.generate_current()
         for station in self.charging_stations:
             station.update()
-        print(f"load : {self.load.current}")
-        total_current = self.load.current
+        total_current = [0, 0, 0]
         for i in range(3):
+            total_current[i] += self.load.current[i]
             total_current[i] += sum(station.current[i] for station in self.charging_stations)
         self.smart_meter.current = total_current
         
