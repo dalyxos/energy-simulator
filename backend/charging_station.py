@@ -13,8 +13,9 @@ class Vehicle:
         self.charging_start_time = 0
         
     def connect(self):
-        self.connected = True
-        self.charging_start_time = time.time()
+        if(not self.connected):
+            self.connected = True
+            self.charging_start_time = time.time()
         
     def disconnect(self):
         self.connected = False
@@ -30,7 +31,6 @@ class Vehicle:
             self.current = self.max_current * (time.time() - self.charging_start_time - self.charging_start_delay) / self.charging_delay
         else:
             self.current = self.max_current * (1 - self.soc / self.capacity)
-            
         return self.current
     
     def increase_soc(self, energy):
@@ -92,6 +92,7 @@ class ChargingStation():
         }
         
     def config_from_json(self, json):
+        print(json)
         if "max_current" in json:
             self.max_current = json["max_current"]
         if "phases" in json:
@@ -103,6 +104,7 @@ class ChargingStation():
                 self.vehicle.connect()
             else:
                 self.vehicle.disconnect()
+            
         return self.config_to_json()
     
         
