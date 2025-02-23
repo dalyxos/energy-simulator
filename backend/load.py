@@ -1,7 +1,7 @@
 import random
 
 class Load:
-    def __init__(self, current_limit=[[0, 10], [0, 10], [0, 10]]):
+    def __init__(self, current_limit=[[0, 2], [0, 0], [0, 0]]):
         self.current_limit = current_limit
         self.current = [0, 0, 0]
 

@@ -2,12 +2,14 @@ from flask import Flask, request
 from smartmeter import SmartMeter
 from load import Load
 from charging_station import ChargingStation
+from inverter import Inverter
 
 class EnergySimulator:
     def __init__(self):
         self.load = Load()
         self.smart_meter = SmartMeter(10, callback=self.callback)
         self.charging_stations = [ChargingStation() for _ in range(3)]
+        self.inverter = Inverter()
         self.smart_meter.start_callback_thread()
 
     def callback(self):
@@ -15,11 +17,20 @@ class EnergySimulator:
         for station in self.charging_stations:
             station.voltage = self.smart_meter.voltage
             station.update()
-        total_current = [0, 0, 0]
+        self.smart_meter.current = [0, 0, 0]
         for i in range(3):
-            total_current[i] += self.load.current[i]
-            total_current[i] += sum(station.current[i] for station in self.charging_stations)
-        self.smart_meter.current = total_current
+            self.smart_meter.current[i] += self.load.current[i]
+            self.smart_meter.current[i] += sum(station.current[i] for station in self.charging_stations)
+        self.inverter.schedule_power_output([self.smart_meter.current[i] * self.smart_meter.voltage[i] for i in range(3)])
+        inverter_power = self.inverter.get_power()
+        while inverter_power > 0 and sum(self.smart_meter.current) > 0:
+            for i in range(3):
+                if inverter_power < self.smart_meter.current[i] * self.smart_meter.voltage[i]:
+                    self.smart_meter.current[i] -= inverter_power / self.smart_meter.voltage[i]
+                    inverter_power = 0
+                else:
+                    self.smart_meter.current[i] -= inverter_power * 0.1 / self.smart_meter.voltage[i]
+                    inverter_power *= 0.9
         
 
 sim = EnergySimulator()
@@ -39,7 +50,10 @@ def overview():
     return {
         "load": sim.load.to_json(),
         "smartmeter": sim.smart_meter.to_json(),
-        "charging_stations": [station.to_json() for station in sim.charging_stations]
+        "charging_stations": [station.to_json() for station in sim.charging_stations],
+        "inverter": sim.inverter.to_json(),
+        "battery": sim.inverter.battery.to_json(),
+        "solar_panel": sim.inverter.solar_panel.to_json()
     }
 
 @app.route('/api/load/config')
